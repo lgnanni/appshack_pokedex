@@ -1,16 +1,33 @@
 package com.lgnanni.appshack.pokedex.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.lgnanni.appshack.pokedex.network.RetrofitInstance
+import androidx.lifecycle.viewModelScope
+import com.lgnanni.appshack.pokedex.model.PokemonListItem
+import com.lgnanni.appshack.pokedex.repository.PokedexRepoImpl
+import dagger.hilt.android.lifecycle.HiltViewModel
+
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class PokemonListViewModel: ViewModel() {
+@HiltViewModel
+class PokemonListViewModel @Inject constructor (repository: PokedexRepoImpl): ViewModel() {
+
+    val pokemonList: StateFlow<List<PokemonListItem>> = repository.getPokemonList()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+}
 
     /*
     var apiService = RetrofitInstance.api
@@ -106,4 +123,3 @@ class PokemonListViewModel: ViewModel() {
     }
 
      */
-}

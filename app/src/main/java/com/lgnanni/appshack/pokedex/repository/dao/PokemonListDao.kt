@@ -8,7 +8,7 @@ import com.lgnanni.appshack.pokedex.repository.entity.PokemonListEntity
 
 @Dao
 interface PokemonListDao {
-    @Query("SELECT * FROM pokemons")
+    @Query("SELECT * FROM pokemonList")
     suspend fun getPokemons(): List<PokemonListEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

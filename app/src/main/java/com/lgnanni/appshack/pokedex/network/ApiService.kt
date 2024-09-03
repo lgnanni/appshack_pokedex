@@ -9,7 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface ApiService {
-    @GET(RetrofitInstance.BASE_URL + "pokemon")
+    @GET("pokemon")
     suspend fun getPokemons(): Response<PokemonList>
 
     @GET("{path}")
@@ -24,4 +24,8 @@ interface ApiService {
     @GET("{path}")
     suspend fun fetchPokemonSpecies(@Path("path") path: String): Response<SpeciesInfo>
 
+}
+
+fun removeBaseUrl(url: String) : String {
+    return url.removePrefix(RetrofitModule.BASE_URL)
 }
