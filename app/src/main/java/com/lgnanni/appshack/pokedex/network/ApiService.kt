@@ -4,7 +4,6 @@ import com.lgnanni.appshack.pokedex.model.Pokemon
 import com.lgnanni.appshack.pokedex.model.PokemonList
 import com.lgnanni.appshack.pokedex.model.SpeciesInfo
 import com.lgnanni.appshack.pokedex.model.PokemonType
-import com.lgnanni.appshack.pokedex.model.Species
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
