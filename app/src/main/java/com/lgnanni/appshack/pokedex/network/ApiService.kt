@@ -1,18 +1,28 @@
 package com.lgnanni.appshack.pokedex.network
 
+import com.lgnanni.appshack.pokedex.model.Pokemon
+import com.lgnanni.appshack.pokedex.model.PokemonList
+import com.lgnanni.appshack.pokedex.model.SpeciesInfo
+import com.lgnanni.appshack.pokedex.model.PokemonType
+import com.lgnanni.appshack.pokedex.model.Species
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface ApiService {
-    @GET()
-    suspend fun getPokemons(): Response<Any>
+    @GET(RetrofitInstance.BASE_URL + "pokemon")
+    suspend fun getPokemons(): Response<PokemonList>
 
-    @GET()
-    suspend fun getPokemonDetails(): Response<Any>
+    @GET("{path}")
+    suspend fun getPokemonDetails(@Path("path") path: String): Response<Pokemon>
 
-    @GET()
-    suspend fun getSpeciesDetails(): Response<Any>
+    @GET("{path}")
+    suspend fun getSpeciesDetails(@Path("path") path: String): Response<SpeciesInfo>
 
-    @GET()
-    suspend fun getTypeDetails(): Response<Any>
+    @GET("{path}")
+    suspend fun getTypeDetails(@Path("path") path: String): Response<PokemonType>
+
+    @GET("{path}")
+    suspend fun fetchPokemonSpecies(@Path("path") path: String): Response<SpeciesInfo>
+
 }
