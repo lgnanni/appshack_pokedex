@@ -13,6 +13,9 @@ interface ApiService {
     suspend fun getPokemons(): Response<PokemonList>
 
     @GET("{path}")
+    suspend fun getPokemonsOffset(@Path("path") path: String): Response<PokemonList>
+
+    @GET("{path}")
     suspend fun getPokemonDetails(@Path("path") path: String): Response<Pokemon>
 
     @GET("{path}")
@@ -24,8 +27,7 @@ interface ApiService {
     @GET("{path}")
     suspend fun fetchPokemonSpecies(@Path("path") path: String): Response<SpeciesInfo>
 
-}
-
-fun removeBaseUrl(url: String) : String {
-    return url.removePrefix(RetrofitModule.BASE_URL)
+    fun removeBaseUrl(url: String) : String {
+        return url.removePrefix(RetrofitModule.BASE_URL)
+    }
 }

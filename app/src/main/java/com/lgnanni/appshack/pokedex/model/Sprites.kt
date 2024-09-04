@@ -8,7 +8,7 @@ data class Sprites (val backDefault: String, val backShiny: String, val frontDef
 
 
 @Parcelize
-data class OtherArtwork(val officialArtwork: Official) : Parcelable
+data class OtherArtwork(val officialArtwork: OfficialSprites) : Parcelable
 
 @Parcelize
-data class Official(val frontDefault: String, val frontShiny: String): Parcelable
+data class OfficialSprites(val frontDefault: String, val frontShiny: String): Parcelable

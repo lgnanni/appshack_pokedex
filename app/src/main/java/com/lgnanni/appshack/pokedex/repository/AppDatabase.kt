@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.lgnanni.appshack.pokedex.repository.dao.PokemonDetailsDao
 import com.lgnanni.appshack.pokedex.repository.dao.PokemonListDao
+import com.lgnanni.appshack.pokedex.repository.entity.PokemonDetailsEntity
 import com.lgnanni.appshack.pokedex.repository.entity.PokemonListEntity
 import dagger.Module
 import dagger.Provides
@@ -13,9 +16,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Database(entities = [PokemonListEntity::class], version = 1)
+@Database(entities = [PokemonListEntity::class, PokemonDetailsEntity::class], version = 2)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun pokemonListDao(): PokemonListDao
+    abstract fun pokemonDetailsDao(): PokemonDetailsDao
+
 }
 
 @Module
@@ -36,5 +42,10 @@ object DatabaseModule {
     @Provides
     fun providePokemonListDao(database: AppDatabase): PokemonListDao {
         return database.pokemonListDao()
+    }
+
+    @Provides
+    fun providePokemonDetailsDao(database: AppDatabase): PokemonDetailsDao {
+        return database.pokemonDetailsDao()
     }
 }

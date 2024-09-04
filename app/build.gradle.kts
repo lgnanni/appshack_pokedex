@@ -66,6 +66,12 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.retrofit2)
     implementation(libs.gson.converter)
+
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core.android)
+
+
+    //room
     implementation (libs.androidx.room.runtime)
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.ktx)
