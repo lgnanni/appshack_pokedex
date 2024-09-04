@@ -15,6 +15,9 @@ coroutines = "1.8.1"
 androidxRoom = "2.6.1"
 androidxHiltNavigationCompose = "1.2.0"
 dataStore = "1.1.1"
+navigationCompose = "2.7.7"
+coil = "2.6.0"
+lifecycleRuntimeComposeAndroid = "2.8.4"
 
 
 [libraries]
@@ -40,6 +43,13 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "androidxRoom" }
 
+material-icons = { group = "androidx.compose.material", name = "material-icons-extended" }
+
+coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil"}
+
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationCompose" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+
 
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -52,6 +62,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore"}
 androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "dataStore" }
+androidx-lifecycle-runtime-compose-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose-android", version.ref = "lifecycleRuntimeComposeAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

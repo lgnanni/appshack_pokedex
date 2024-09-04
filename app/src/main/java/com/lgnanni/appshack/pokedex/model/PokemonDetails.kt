@@ -11,4 +11,16 @@ data class PokemonDetails(
     val officialSprite: OfficialSprites,
     val speciesInfo: SpeciesInfo,
     val typeSprites: List<String>
-    ) : Parcelable
+    ) : Parcelable {
+
+        constructor() : this (
+            -1,
+            "",
+            Cries("", ""),
+            OfficialSprites("", ""),
+            SpeciesInfo("", emptyList()),
+            emptyList()
+        )
+
+}
+

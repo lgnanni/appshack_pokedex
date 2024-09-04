@@ -1,14 +1,32 @@
 package com.lgnanni.appshack.pokedex.ui.screens
 
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lgnanni.appshack.pokedex.viewmodel.PokemonListUiState
 import com.lgnanni.appshack.pokedex.viewmodel.PokemonListViewModel
 
 @Composable
-fun HomeScreen(modifier: Modifier) {
+fun HomeScreen() {
     val vm: PokemonListViewModel = hiltViewModel()
 
-    val result = vm.pokemonList.collectAsState()
+    val uiState by vm.pokemonListUiState.collectAsStateWithLifecycle()
+
+    when(uiState) {
+        is PokemonListUiState.Loading -> {}
+        is PokemonListUiState.ListPopulated -> {
+            val listPopulated = (uiState as PokemonListUiState.ListPopulated)
+            LazyColumn {
+                items(listPopulated.list.size) { pokemonIndex ->
+                    HomeItem(pokemonIndex,listPopulated.list[pokemonIndex].name)
+                }
+            }
+        }
+        is PokemonListUiState.Error -> {}
+    }
+
+
+
 }

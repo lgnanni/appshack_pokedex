@@ -5,16 +5,18 @@ import com.lgnanni.appshack.pokedex.model.PokemonList
 import com.lgnanni.appshack.pokedex.model.SpeciesInfo
 import com.lgnanni.appshack.pokedex.model.PokemonType
 import com.lgnanni.appshack.pokedex.model.TypeSprite
+import com.lgnanni.appshack.pokedex.model.TypeSpriteInfo
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @GET("pokemon")
     suspend fun getPokemons(): Response<PokemonList>
 
-    @GET("{path}")
-    suspend fun getPokemonsOffset(@Path("path") path: String): Response<PokemonList>
+    @GET("pokemon")
+    suspend fun getPokemonsOffset(@Query("offset") offset: Int, @Query("limit") limit: Int): Response<PokemonList>
 
     @GET("pokemon/{id}")
     suspend fun getPokemonDetails(@Path("id") id: Int): Response<Pokemon>
@@ -22,10 +24,6 @@ interface ApiService {
     @GET("{path}")
     suspend fun getSpeciesDetails(@Path("path") path: String): Response<SpeciesInfo>
 
-    @GET("{path}")
-    suspend fun getTypeSprite(@Path("path") path: String): Response<TypeSprite>
-
-    fun removeBaseUrl(url: String) : String {
-        return url.removePrefix(RetrofitModule.BASE_URL)
-    }
+    @GET("type/{path}")
+    suspend fun getTypeSprite(@Path("path") path: String): Response<TypeSpriteInfo>
 }

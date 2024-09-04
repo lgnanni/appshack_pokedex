@@ -1,13 +1,19 @@
 package com.lgnanni.appshack.pokedex.model
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class TypeSprite(val generationVIII: GenerationVIII) : Parcelable
+data class TypeSpriteInfo(val sprites: TypeSprite): Parcelable
 
 @Parcelize
-data class GenerationVIII(val swordShield: SwordShield) : Parcelable
+data class TypeSprite(@SerializedName("generation-viii") val generationVIII: GenerationVIII) : Parcelable
+
 
 @Parcelize
-data class SwordShield(val nameIcon: String): Parcelable
+data class GenerationVIII(
+    @SerializedName("sword-shield") val swordShield: SwordShield) : Parcelable
+
+@Parcelize
+data class SwordShield(@SerializedName("name_icon") val nameIcon: String): Parcelable

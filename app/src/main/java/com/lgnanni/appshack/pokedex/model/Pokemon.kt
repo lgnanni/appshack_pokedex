@@ -12,7 +12,7 @@ data class Pokemon(
   val sprites: Sprites,
   val species: Species,
   val cries: Cries,
-  val types: ArrayList<Types>
+  val types: List<Types>
 ) : Parcelable {
 
 }
