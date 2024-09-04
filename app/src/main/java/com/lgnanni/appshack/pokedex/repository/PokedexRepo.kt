@@ -13,7 +13,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface PokedexRepo {
-
     fun getPokemonList(nextUrl: String = ""): Flow<List<PokemonListItem>>
     fun getPokemonDetails(id: Int): Flow<PokemonDetails>
 }
@@ -59,6 +58,40 @@ class PokedexRepoImpl @Inject constructor(
         // Emit cached data first
         val cachedPokemonDetails = pokemonDetailsDao.getPokemonDetails(id).toPokemonDetails()
         emit(cachedPokemonDetails)
+
+        // Fetch data from remote, if fails, fetch from local
+        try {
+            // Fetch from remote
+            val remotePokemonDetails = pokemonApi.getPokemonDetails(id)
+
+            val pokemon = remotePokemonDetails.body()
+            val remotePokemonSpecies = pokemonApi.getSpeciesDetails(pokemonApi.removeBaseUrl(pokemon!!.species.url))
+
+            val typeSprites = emptyList<String>().toMutableList()
+            pokemon.types.forEach {
+                val remotePokemonTypes = pokemonApi.getTypeSprite(pokemonApi.removeBaseUrl(it.type.url))
+                typeSprites.add(remotePokemonTypes.body()!!.generationVIII.swordShield.nameIcon)
+            }
+
+            val pokemonSprites = pokemon.sprites.other.officialArtwork
+
+            val pokemonDetails = PokemonDetails(
+                id,
+                pokemon.name,
+                pokemon.cries,
+                pokemonSprites,
+                remotePokemonSpecies.body()!!,
+                typeSprites
+                )
+            // Cache the result locally
+            pokemonDetailsDao.insertPokemonDetails(pokemonDetails.toPokemonDetailsEntity())
+            // Emit fresh data
+            emit(pokemonDetails)
+
+        } catch (e: Exception) {
+            // Handle exception
+            e.printStackTrace()
+        }
     }
 }
 

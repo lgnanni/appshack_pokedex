@@ -6,5 +6,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Types(
     val slot: Int,
-    val pokemonType: PokemonType,
+    val type: PokemonType,
 ) : Parcelable

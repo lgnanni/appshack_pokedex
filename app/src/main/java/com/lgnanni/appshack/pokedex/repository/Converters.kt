@@ -50,14 +50,14 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromTypeSprite(typeSprite: TypeSprite): String {
-        return gson.toJson(typeSprite)
+    fun fromList(list: List<String>): String {
+        return gson.toJson(list)
     }
 
     @TypeConverter
-    fun toTypeSprite(typeSpriteString: String): TypeSprite {
-        val type = object : TypeToken<TypeSprite>() {}.type
-        return gson.fromJson(typeSpriteString, type)
+    fun toList(listString: String): List<String> {
+        val type = object : TypeToken<List<String>>() {}.type
+        return gson.fromJson(listString, type)
     }
 }
 
@@ -65,5 +65,5 @@ class Converters {
 fun PokemonListEntity.toPokemonListItem() = PokemonListItem(name, url)
 fun PokemonListItem.toPokemonListEntity() = PokemonListEntity(name, url)
 
-fun PokemonDetailsEntity.toPokemonDetails() = PokemonDetails(id, name, cries, officialSprite, speciesInfo, typeSprite)
-fun PokemonDetails.toPokemonDetailsEntity() = PokemonDetailsEntity(id, name, cries, officialSprite, speciesInfo, typeSprite)
+fun PokemonDetailsEntity.toPokemonDetails() = PokemonDetails(id, name, cries, officialSprite, speciesInfo, typeSprites)
+fun PokemonDetails.toPokemonDetailsEntity() = PokemonDetailsEntity(id, name, cries, officialSprite, speciesInfo, typeSprites)

@@ -14,5 +14,5 @@ data class PokemonDetailsEntity (
     val cries: Cries,
     val officialSprite: OfficialSprites,
     val speciesInfo: SpeciesInfo,
-    val typeSprite: TypeSprite
+    val typeSprites: List<String>
 )
