@@ -18,7 +18,7 @@ data class PokemonDetails(
             "",
             Cries("", ""),
             OfficialSprites("", ""),
-            SpeciesInfo("", emptyList()),
+            SpeciesInfo(EvolvesFrom(null, ""), emptyList()),
             emptyList()
         )
 

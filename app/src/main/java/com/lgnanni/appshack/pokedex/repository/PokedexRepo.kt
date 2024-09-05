@@ -171,8 +171,14 @@ class PokedexRepoImpl @Inject constructor(
             val remotePokemons = pokemonApi.getPokemonsOffset(0, count)
 
             val pokemonList = remotePokemons.body()!!
-            pokemonListDao.insertPokemons(pokemonList.results.map { it.toPokemonListEntity() })
-            emit(pokemonList.results)
+
+            //There are variations which are outside the norm on the api
+            //recognizabled by their url id being on the 10000s when theres
+            // a 4 digits amount of pokemons so we remove them to avoid breaks on random pokemon selection
+            val filteredList = pokemonList.results.filter { item -> item.url.substringAfter("pokemon/").length <= 5 }
+
+            pokemonListDao.insertPokemons(filteredList.map { it.toPokemonListEntity() })
+            emit(filteredList)
         } catch (e: Exception) {
             // Handle exception
             e.printStackTrace()
