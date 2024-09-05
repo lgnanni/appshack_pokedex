@@ -40,6 +40,11 @@ class PokemonListViewModel @Inject constructor (repository: PokedexRepoImpl): Vi
             initialValue = PokemonListUiState.Loading)
 
 
+    val selectedId = MutableStateFlow(0)
+
+    fun setSelectedId(id: Int) {
+        selectedId.value = id
+    }
 }
 
 sealed interface PokemonListUiState {

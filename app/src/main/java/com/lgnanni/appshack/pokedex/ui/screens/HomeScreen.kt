@@ -20,7 +20,9 @@ fun HomeScreen() {
             val listPopulated = (uiState as PokemonListUiState.ListPopulated)
             LazyColumn {
                 items(listPopulated.list.size) { pokemonIndex ->
-                    HomeItem(pokemonIndex,listPopulated.list[pokemonIndex].name)
+                    HomeItem(pokemonIndex + 1,listPopulated.list[pokemonIndex].name) {
+                        vm.setSelectedId(pokemonIndex)
+                    }
                 }
             }
         }

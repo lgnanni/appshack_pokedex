@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -52,7 +53,6 @@ import androidx.navigation.navArgument
 import com.lgnanni.appshack.pokedex.network.ConnectionState
 import com.lgnanni.appshack.pokedex.network.connectivityState
 import com.lgnanni.appshack.pokedex.ui.screens.DetailScreen
-import com.lgnanni.appshack.pokedex.ui.screens.HomeItem
 import com.lgnanni.appshack.pokedex.ui.screens.HomeScreen
 import com.lgnanni.appshack.pokedex.ui.theme.AppshackPokedexTheme
 import com.lgnanni.appshack.pokedex.viewmodel.MainViewModel
@@ -74,10 +74,13 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val darkTheme: Boolean by vm.darkTheme.collectAsState(initial = isSystemInDarkTheme())
-            val error: String by vm.error.collectAsState("")
+            val darkTheme: Boolean by vm.darkTheme.collectAsStateWithLifecycle(isSystemInDarkTheme())
+            val error: String by vm.error.collectAsStateWithLifecycle("")
 
-            val pokemonId: Int by vm.pokemonId.collectAsState(0)
+            val pokemonId by vm.pokemonId.collectAsState(0)
+            val lastId by vm.lastPokemonId.collectAsState(0)
+
+            val selectedId by vmList.selectedId.collectAsState(0)
 
             val snackBarHostState = remember { SnackbarHostState() }
             val navController = rememberNavController()
@@ -90,10 +93,12 @@ class MainActivity : ComponentActivity() {
                 is PokemonListUiState.Loading -> {}
                 is PokemonListUiState.ListPopulated -> {
                     val listPopulated = (pokemonListUiState as PokemonListUiState.ListPopulated)
+                    vm.setPokemonCount(listPopulated.list.size)
                     vm.setPokemonId((1..listPopulated.list.size).random())
                 }
                 is PokemonListUiState.Error -> {}
             }
+
             //Listen to have visual feedback of navigation returns
             DisposableEffect(navController) {
                 val listener = NavController.OnDestinationChangedListener { controller, _, _ ->
@@ -144,6 +149,18 @@ class MainActivity : ComponentActivity() {
                                 }
                             },
                             actions = {
+
+                                IconButton(
+                                    onClick = {
+                                        vm.randomPokemon()
+                                    }) {
+
+                                    Icon(
+                                        imageVector = Icons.Filled.Refresh,
+                                        contentDescription = null
+                                    )
+                                }
+
                                 val isDarkOn = darkTheme
 
                                 IconButton(
@@ -168,6 +185,9 @@ class MainActivity : ComponentActivity() {
                             .padding(it),
                         color = MaterialTheme.colorScheme.surfaceContainer
                     ) {
+                        if (selectedId != 0)
+                            vm.setPokemonId(selectedId)
+
                         if (error.isNotEmpty()) {
                             LaunchedEffect(key1 = snackBarHostState.currentSnackbarData) {
                                 lifecycleScope.launch {
@@ -230,10 +250,11 @@ class MainActivity : ComponentActivity() {
                                 },
                             ) { DetailScreen() }
                         }
-                        if (pokemonId > 0) {
-                            navController.navigate("detail/$pokemonId") {
-                                launchSingleTop = true
-                            }
+                        if (pokemonId > 0 && pokemonId != lastId) {
+
+                            navController.clearBackStack("detail/$lastId")
+                            navController.navigate("detail/$pokemonId")
+
                         }
                     }
                 }
