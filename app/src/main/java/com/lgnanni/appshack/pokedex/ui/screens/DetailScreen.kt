@@ -63,7 +63,7 @@ fun DetailScreen() {
         }
         is PokemonDetailsUiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(modifier = Modifier.fillMaxWidth(0.5f))
+                CircularProgressIndicator(modifier = Modifier.fillMaxWidth(0.25f).align(Alignment.Center))
             }
         }
     }

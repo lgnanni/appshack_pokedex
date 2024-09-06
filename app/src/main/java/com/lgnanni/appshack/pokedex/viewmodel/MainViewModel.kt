@@ -25,7 +25,7 @@ class MainViewModel: ViewModel() {
 
     fun randomPokemon() {
         val id = (1..pokemonCount.value).random()
-        pokemonId.value = if (id == lastPokemonId.value) (1..lastPokemonId.value).random() else id
+        setPokemonId(if (id == lastPokemonId.value) (1..lastPokemonId.value).random() else id)
     }
 
     fun setIsConnected(conn: Boolean) {

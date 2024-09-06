@@ -26,6 +26,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PokemonListViewModel @Inject constructor (repository: PokedexRepoImpl): ViewModel() {
 
+
+    val filteredList = MutableStateFlow(emptyList<PokemonListItem>())
+
     val pokemonListUiState = repository.getPokemonList()
         .map {
             list ->
@@ -40,10 +43,18 @@ class PokemonListViewModel @Inject constructor (repository: PokedexRepoImpl): Vi
             initialValue = PokemonListUiState.Loading)
 
 
-    val selectedId = MutableStateFlow(0)
+    private var selectedId = MutableStateFlow(0)
 
     fun setSelectedId(id: Int) {
         selectedId.value = id
+    }
+
+    fun setSelectedFlow(flow: MutableStateFlow<Int>) {
+        selectedId = flow
+    }
+
+    fun setFilteredList(text: String  = "") {
+        filteredList.value = (pokemonListUiState.value as PokemonListUiState.ListPopulated).list.filter { it.name.contains(text) }
     }
 }
 

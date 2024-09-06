@@ -80,8 +80,6 @@ class MainActivity : ComponentActivity() {
             val pokemonId by vm.pokemonId.collectAsState(0)
             val lastId by vm.lastPokemonId.collectAsState(0)
 
-            val selectedId by vmList.selectedId.collectAsState(0)
-
             val snackBarHostState = remember { SnackbarHostState() }
             val navController = rememberNavController()
 
@@ -185,8 +183,6 @@ class MainActivity : ComponentActivity() {
                             .padding(it),
                         color = MaterialTheme.colorScheme.surfaceContainer
                     ) {
-                        if (selectedId != 0)
-                            vm.setPokemonId(selectedId)
 
                         if (error.isNotEmpty()) {
                             LaunchedEffect(key1 = snackBarHostState.currentSnackbarData) {
@@ -251,10 +247,11 @@ class MainActivity : ComponentActivity() {
                             ) { DetailScreen() }
                         }
                         if (pokemonId > 0 && pokemonId != lastId) {
+                            if (navController.currentDestination?.hasRoute("detail/{pokemonId}", null) == true){
+                                navController.popBackStack("detail/{pokemonId}", true)
+                            }
 
-                            navController.clearBackStack("detail/$lastId")
                             navController.navigate("detail/$pokemonId")
-
                         }
                     }
                 }

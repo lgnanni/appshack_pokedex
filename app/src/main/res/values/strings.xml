@@ -2,4 +2,5 @@
     <string name="app_name">Appshack Pokedex</string>
     <string name="light_dark">Light / Dark theme</string>
     <string name="retry">Retry</string>
+    <string name="search">Search</string>
 </resources>
