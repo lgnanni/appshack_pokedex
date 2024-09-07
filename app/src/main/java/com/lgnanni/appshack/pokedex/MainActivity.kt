@@ -220,7 +220,7 @@ class MainActivity : ComponentActivity() {
                                         tween(300)
                                     )
                                 },
-                            ) { HomeScreen() }
+                            ) { HomeScreen(vm) }
                             composable(
                                 "detail/{pokemonId}",
                                 arguments = listOf(navArgument("pokemonId") {

@@ -16,11 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lgnanni.appshack.pokedex.ui.screens.views.SearchField
+import com.lgnanni.appshack.pokedex.viewmodel.MainViewModel
 import com.lgnanni.appshack.pokedex.viewmodel.PokemonListUiState
 import com.lgnanni.appshack.pokedex.viewmodel.PokemonListViewModel
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(mainVm: MainViewModel) {
     val vm: PokemonListViewModel = hiltViewModel()
 
     val uiState by vm.pokemonListUiState.collectAsStateWithLifecycle()
@@ -29,7 +30,9 @@ fun HomeScreen() {
     when(uiState) {
         is PokemonListUiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(modifier = Modifier.fillMaxWidth(0.25f).align(Alignment.Center))
+                CircularProgressIndicator(modifier = Modifier
+                    .fillMaxWidth(0.25f)
+                    .align(Alignment.Center))
             }
         }
         is PokemonListUiState.ListPopulated -> {
@@ -44,7 +47,7 @@ fun HomeScreen() {
                 LazyColumn {
                     items(filteredList.size) { pokemonIndex ->
                         HomeItem(pokemonIndex + 1, filteredList[pokemonIndex].name) {
-                            vm.setSelectedId(pokemonIndex)
+                            mainVm.setPokemonId(pokemonIndex + 1)
                         }
                     }
                 }
