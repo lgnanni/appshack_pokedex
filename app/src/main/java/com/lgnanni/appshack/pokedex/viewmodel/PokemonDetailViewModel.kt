@@ -7,6 +7,7 @@ import com.lgnanni.appshack.pokedex.model.PokemonDetails
 import com.lgnanni.appshack.pokedex.model.PokemonListItem
 import com.lgnanni.appshack.pokedex.repository.PokedexRepoImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -20,6 +21,8 @@ class PokemonDetailViewModel @Inject constructor (
 
     private val pokemonId: Int = savedStateHandle["pokemonId"] ?: 0 // Default value if not provided
 
+    val firstLoad = MutableStateFlow(true)
+
     val pokemonDetailsUiState = repository.getPokemonDetails(pokemonId)
         .map {
                 details ->
@@ -32,6 +35,10 @@ class PokemonDetailViewModel @Inject constructor (
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = PokemonDetailsUiState.Loading)
+
+    fun flagFirstLoad() {
+        firstLoad.value = false
+    }
 }
 
 sealed interface PokemonDetailsUiState {

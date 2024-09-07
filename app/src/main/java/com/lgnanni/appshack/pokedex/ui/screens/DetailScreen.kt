@@ -17,9 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -53,17 +51,24 @@ fun DetailScreen() {
     val vm: PokemonDetailViewModel = hiltViewModel()
 
     val uiState by vm.pokemonDetailsUiState.collectAsStateWithLifecycle()
+    val firstLoad by vm.firstLoad.collectAsStateWithLifecycle()
+
     when(uiState) {
         is PokemonDetailsUiState.Error -> {}
         is PokemonDetailsUiState.DetailsLoaded -> {
             val details = (uiState as PokemonDetailsUiState.DetailsLoaded).details
             PokemonDetailsView(details = details)
-            playCry(details.cries.latest)
+            if (firstLoad) {
+                playCry(details.cries.latest)
+                vm.flagFirstLoad()
+            }
 
         }
         is PokemonDetailsUiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(modifier = Modifier.fillMaxWidth(0.25f).align(Alignment.Center))
+                CircularProgressIndicator(modifier = Modifier
+                    .fillMaxWidth(0.25f)
+                    .align(Alignment.Center))
             }
         }
     }
@@ -95,100 +100,97 @@ fun PokemonDetailsView(details: PokemonDetails) {
     }
 
     Column(modifier = Modifier.padding(8.dp)) {
-        Row (modifier = Modifier
-            .height(160.dp)
-            .fillMaxWidth()) {
 
-            Box {
-                this@Row.AnimatedVisibility(
-                    visible = !shiny,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    SubcomposeAsyncImage(
-                        modifier = Modifier.clickable { shiny = true },
-                        model = imageLoaderDefault,
-                        contentDescription = null,
-                        contentScale = ContentScale.FillHeight,
-                        loading =
-                        {
-                            Box(
-                                modifier = Modifier
-                                    .height(100.dp)
-                                    .padding(20.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            this@Column.AnimatedVisibility(
+                visible = !shiny,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                SubcomposeAsyncImage(
+                    modifier = Modifier
+                        .clickable { shiny = true }
+                        .fillMaxWidth(),
+                    model = imageLoaderDefault,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    loading =
+                    {
+                        Box(
+                            modifier = Modifier
+                                .height(180.dp)
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
-                    )
-                }
-
-                this@Row.AnimatedVisibility(
-                    visible = shiny,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    SubcomposeAsyncImage(
-                        modifier = Modifier.clickable { shiny = false },
-                        model = imageLoaderShiny,
-                        contentDescription = null,
-                        contentScale = ContentScale.FillHeight,
-                        loading =
-                        {
-                            Box(
-                                modifier = Modifier
-                                    .height(100.dp)
-                                    .padding(20.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                        }
-                    )
-                }
-
+                    }
+                )
             }
 
-            Column(modifier = Modifier.height(160.dp)) {
-                Row (verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "#${details.id} ${details.name.capitalize(Locale.current)}",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    IconButton(onClick = {
-                        playCry(details.cries.latest)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.PlayCircle,
-                            contentDescription = null
-                        )
+            this@Column.AnimatedVisibility(
+                visible = shiny,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                SubcomposeAsyncImage(
+                    modifier = Modifier
+                        .clickable { shiny = false }
+                        .fillMaxWidth(),
+                    model = imageLoaderShiny,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    loading =
+                    {
+                        Box(
+                            modifier = Modifier
+                                .height(180.dp)
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Row  {
-                    typeSpritesBuilders.forEach {
-                        SubcomposeAsyncImage(
-                            model = it,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillHeight)
-                    }
-                }
+                )
             }
+
         }
+        Row (verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "#${details.id} ${details.name.capitalize(Locale.current)}",
+                    style = MaterialTheme.typography.titleLarge
+                )
 
-        val text = details.speciesInfo.flavorTextEntries.filter { it.language.name.contentEquals("en") }.first()
+                Spacer(modifier = Modifier.width(6.dp))
+
+                IconButton(onClick = {
+                    playCry(details.cries.latest)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.PlayCircle,
+                        contentDescription = null
+                    )
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                typeSpritesBuilders.forEach {
+                    SubcomposeAsyncImage(
+                        model = it,
+                        contentDescription = null,
+                        contentScale = ContentScale.FillHeight)
+                }
+            }
+
+        val text =
+            details.speciesInfo.flavorTextEntries.first { it.language.name.contentEquals("en") }
 
         Text(
             text = text.flavorText,
             style = MaterialTheme.typography.bodyLarge)
     }
-
 
 }
 

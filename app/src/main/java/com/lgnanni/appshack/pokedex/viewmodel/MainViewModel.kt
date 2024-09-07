@@ -18,15 +18,20 @@ class MainViewModel: ViewModel() {
     fun setError(err: String) { error.value = err }
 
     fun setPokemonId(id: Int = 0) {
-        lastPokemonId.value = pokemonId.value
+        setLastPokemonId()
         pokemonId.value = id
     }
+
+    fun setLastPokemonId() { lastPokemonId.value = pokemonId.value }
+
     fun setPokemonCount(count: Int) { pokemonCount.value = count }
 
     fun randomPokemon() {
         val id = (1..pokemonCount.value).random()
         setPokemonId(if (id == lastPokemonId.value) (1..lastPokemonId.value).random() else id)
     }
+
+    fun firstLoad(): Boolean { return pokemonCount.value == 0 }
 
     fun setIsConnected(conn: Boolean) {
         connected.value = conn

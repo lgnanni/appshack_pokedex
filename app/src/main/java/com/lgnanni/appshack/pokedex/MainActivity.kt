@@ -91,8 +91,10 @@ class MainActivity : ComponentActivity() {
                 is PokemonListUiState.Loading -> {}
                 is PokemonListUiState.ListPopulated -> {
                     val listPopulated = (pokemonListUiState as PokemonListUiState.ListPopulated)
-                    vm.setPokemonCount(listPopulated.list.size)
-                    vm.setPokemonId((1..listPopulated.list.size).random())
+                    if(vm.firstLoad()) {
+                        vm.setPokemonCount(listPopulated.list.size)
+                        vm.setPokemonId((1..listPopulated.list.size).random())
+                    }
                 }
                 is PokemonListUiState.Error -> {}
             }
@@ -252,6 +254,8 @@ class MainActivity : ComponentActivity() {
                             }
 
                             navController.navigate("detail/$pokemonId")
+
+                            vm.setLastPokemonId()
                         }
                     }
                 }
