@@ -1,7 +1,10 @@
 package com.lgnanni.appshack.pokedex.viewmodel
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
+
 
 class MainViewModel: ViewModel() {
 
@@ -10,7 +13,7 @@ class MainViewModel: ViewModel() {
     val connected = MutableStateFlow(false)
     val pokemonId = MutableStateFlow(0)
     val lastPokemonId = MutableStateFlow(0)
-    private val pokemonCount = MutableStateFlow(0)
+    val pokemonCount = MutableStateFlow(0)
 
     fun setDarkTheme(dark: Boolean) { darkTheme.value = dark }
 

@@ -53,6 +53,7 @@ import androidx.navigation.navArgument
 import com.lgnanni.appshack.pokedex.network.ConnectionState
 import com.lgnanni.appshack.pokedex.network.connectivityState
 import com.lgnanni.appshack.pokedex.ui.screens.DetailScreen
+import com.lgnanni.appshack.pokedex.ui.screens.DetailsPager
 import com.lgnanni.appshack.pokedex.ui.screens.HomeScreen
 import com.lgnanni.appshack.pokedex.ui.theme.AppshackPokedexTheme
 import com.lgnanni.appshack.pokedex.viewmodel.MainViewModel
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val darkTheme: Boolean by vm.darkTheme.collectAsStateWithLifecycle(isSystemInDarkTheme())
+            val darkTheme = remember { mutableStateOf(false) }
             val error: String by vm.error.collectAsStateWithLifecycle("")
 
             val pokemonId by vm.pokemonId.collectAsState(0)
@@ -117,7 +118,7 @@ class MainActivity : ComponentActivity() {
             }
 
             ConnectivityStatus(vm)
-            AppshackPokedexTheme(darkTheme = darkTheme) {
+            AppshackPokedexTheme(darkTheme = darkTheme.value) {
                 Scaffold(
                     topBar = {
                         CenterAlignedTopAppBar(
@@ -161,11 +162,11 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
 
-                                val isDarkOn = darkTheme
+                                val isDarkOn = darkTheme.value
 
                                 IconButton(
                                     onClick = {
-                                        vm.setDarkTheme(!darkTheme)
+                                        darkTheme.value = !darkTheme.value
                                     }) {
                                     val icon =
                                         if (isDarkOn) Icons.Filled.LightMode else Icons.Filled.DarkMode
@@ -246,7 +247,7 @@ class MainActivity : ComponentActivity() {
                                         tween(300)
                                     )
                                 },
-                            ) { DetailScreen() }
+                            ) { DetailsPager(vm) }
                         }
                         if (pokemonId > 0 && pokemonId != lastId) {
                             if (navController.currentDestination?.hasRoute("detail/{pokemonId}", null) == true){

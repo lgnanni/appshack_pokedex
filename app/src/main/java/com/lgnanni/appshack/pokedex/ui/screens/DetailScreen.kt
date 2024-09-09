@@ -3,13 +3,11 @@ package com.lgnanni.appshack.pokedex.ui.screens
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,35 +40,46 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.lgnanni.appshack.pokedex.model.PokemonDetails
 import com.lgnanni.appshack.pokedex.viewmodel.PokemonDetailViewModel
-import com.lgnanni.appshack.pokedex.viewmodel.PokemonDetailsUiState
-import com.lgnanni.appshack.pokedex.viewmodel.PokemonListUiState
+import com.lgnanni.appshack.pokedex.viewmodel.UiState
 import okio.IOException
 
 @Composable
-fun DetailScreen() {
+fun DetailScreen(pokeId: Int) {
     val vm: PokemonDetailViewModel = hiltViewModel()
 
-    val uiState by vm.pokemonDetailsUiState.collectAsStateWithLifecycle()
+    val uiState by vm.uiState.collectAsStateWithLifecycle(UiState.Loading)
     val firstLoad by vm.firstLoad.collectAsStateWithLifecycle()
+    val vmPokeId by vm.pokemonId.collectAsStateWithLifecycle()
+
+    if (pokeId != vmPokeId) {
+        vm.fetchNewPokemon(pokeId)
+        vm.setFirstLoad(true)
+    }
 
     when(uiState) {
-        is PokemonDetailsUiState.Error -> {}
-        is PokemonDetailsUiState.DetailsLoaded -> {
-            val details = (uiState as PokemonDetailsUiState.DetailsLoaded).details
-            PokemonDetailsView(details = details)
-            if (firstLoad) {
+        is UiState.Error -> {}
+        is UiState.Success -> {
+            val details = (uiState as UiState.Success<PokemonDetails>).data
+
+            if (firstLoad && details.id == pokeId) {
                 playCry(details.cries.latest)
-                vm.flagFirstLoad()
+                vm.setFirstLoad(false)
             }
 
+            PokemonDetailsView(details = details)
         }
-        is PokemonDetailsUiState.Loading -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(modifier = Modifier
-                    .fillMaxWidth(0.25f)
-                    .align(Alignment.Center))
-            }
-        }
+        is UiState.Loading -> { LoadingScreen() }
+
+        is UiState.Empty -> {}
+    }
+}
+
+@Composable
+fun LoadingScreen () {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(modifier = Modifier
+            .fillMaxWidth(0.25f)
+            .align(Alignment.Center))
     }
 }
 
@@ -204,8 +213,9 @@ private fun playCry(url: String) {
 
     try {
         mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
+        mediaPlayer.prepare()
         mediaPlayer.setOnPreparedListener {
+
             it.start()
         }
     } catch (e: IOException) {
