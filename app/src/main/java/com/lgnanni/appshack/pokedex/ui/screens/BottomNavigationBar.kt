@@ -27,7 +27,9 @@ fun BottomNavigationBar(navController: NavHostController) {
                     if (it.contains("home"))
                         return@NavigationBarItem
                     else {
-                        if (navController.currentDestination?.hasRoute("detail/{pokemonId}", null) == true){
+
+                        val destinationExists = navController.graph.findNode("detail/{pokemonId}") != null
+                        if (destinationExists) {
                             navController.popBackStack("detail/{pokemonId}", true)
                         }
 
@@ -54,7 +56,8 @@ fun BottomNavigationBar(navController: NavHostController) {
                         return@NavigationBarItem
                 }
 
-                if (navController.currentDestination?.hasRoute("detail/{pokemonId}", null) == true){
+                val destinationExists = navController.graph.findNode("detail/{pokemonId}") != null
+                if (destinationExists) {
                     navController.popBackStack("detail/{pokemonId}", true)
                 }
 

@@ -211,6 +211,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         NavHost(navController, startDestination = "home") {
+
                             composable(
                                 "home",
                                 enterTransition = {
@@ -271,7 +272,9 @@ class MainActivity : ComponentActivity() {
                             ) { DetailsPager(vm) }
                         }
                         if (navToDetails) {
-                            if (navController.currentDestination?.hasRoute("detail/{pokemonId}", null) == true){
+                            val destinationExists = navController.graph.findNode("detail/{pokemonId}") != null
+
+                            if (destinationExists) {
                                 navController.popBackStack("detail/{pokemonId}", true)
                             }
 
