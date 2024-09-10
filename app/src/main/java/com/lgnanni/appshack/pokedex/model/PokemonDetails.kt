@@ -10,7 +10,8 @@ data class PokemonDetails(
     val cries: Cries,
     val officialSprite: OfficialSprites,
     val speciesInfo: SpeciesInfo,
-    val typeSprites: List<String>
+    val typeSprites: List<String>,
+    val starred: Boolean
     ) : Parcelable {
 
         constructor() : this (
@@ -18,9 +19,20 @@ data class PokemonDetails(
             "",
             Cries("", ""),
             OfficialSprites("", ""),
-            SpeciesInfo(EvolvesFrom(null, ""), emptyList()),
-            emptyList()
+            SpeciesInfo(EvoChain( ""), emptyList()),
+            emptyList(),
+    false
         )
+
+    constructor(details: PokemonDetails, starred: Boolean) : this (
+        details.id,
+        details.name,
+        details.cries,
+        details.officialSprite,
+        details.speciesInfo,
+        details.typeSprites,
+        starred
+    )
 
 }
 

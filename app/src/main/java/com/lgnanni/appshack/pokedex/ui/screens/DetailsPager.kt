@@ -19,10 +19,9 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun DetailsPager(vm: MainViewModel) {
 
-    val pokeCount by vm.pokemonCount.collectAsStateWithLifecycle()
-
+    val pokeCount by vm.pokemons.collectAsStateWithLifecycle()
     val pokemonId by vm.pokemonId.collectAsStateWithLifecycle()
-    val pagerState = rememberPagerState(pageCount = { pokeCount })
+    val pagerState = rememberPagerState(pageCount = { pokeCount.size })
 
 
     HorizontalPager(state = pagerState) {
@@ -30,6 +29,7 @@ fun DetailsPager(vm: MainViewModel) {
     }
 
     LaunchedEffect(key1 = pokemonId) {
+        vm.setNavToDetails(false)
         if (pagerState.currentPage != pokemonId)
             vm.viewModelScope.launch { pagerState.scrollToPage(pokemonId) }
     }

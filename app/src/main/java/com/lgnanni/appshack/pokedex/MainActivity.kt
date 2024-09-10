@@ -52,6 +52,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.lgnanni.appshack.pokedex.network.ConnectionState
 import com.lgnanni.appshack.pokedex.network.connectivityState
+import com.lgnanni.appshack.pokedex.ui.screens.BottomNavigationBar
 import com.lgnanni.appshack.pokedex.ui.screens.DetailScreen
 import com.lgnanni.appshack.pokedex.ui.screens.DetailsPager
 import com.lgnanni.appshack.pokedex.ui.screens.HomeScreen
@@ -78,8 +79,8 @@ class MainActivity : ComponentActivity() {
             val darkTheme = remember { mutableStateOf(false) }
             val error: String by vm.error.collectAsStateWithLifecycle("")
 
-            val pokemonId by vm.pokemonId.collectAsState(0)
-            val lastId by vm.lastPokemonId.collectAsState(0)
+            val pokemonId by vm.pokemonId.collectAsStateWithLifecycle()
+            val navToDetails by vm.navigateToDetails.collectAsStateWithLifecycle()
 
             val snackBarHostState = remember { SnackbarHostState() }
             val navController = rememberNavController()
@@ -93,8 +94,8 @@ class MainActivity : ComponentActivity() {
                 is PokemonListUiState.ListPopulated -> {
                     val listPopulated = (pokemonListUiState as PokemonListUiState.ListPopulated)
                     if(vm.firstLoad()) {
-                        vm.setPokemonCount(listPopulated.list.size)
-                        vm.setPokemonId((1..listPopulated.list.size).random())
+                        vm.setPokemons(listPopulated.list)
+                        vm.randomPokemon()
                     }
                 }
                 is PokemonListUiState.Error -> {}
@@ -177,6 +178,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             })
                     },
+                    bottomBar = { BottomNavigationBar(navController) },
                     snackbarHost = { SnackbarHost(snackBarHostState) },
                 ) {
                     // A surface container using the 'background' color from the theme
@@ -223,7 +225,26 @@ class MainActivity : ComponentActivity() {
                                         tween(300)
                                     )
                                 },
-                            ) { HomeScreen(vm) }
+                            ) {
+                                HomeScreen(vm, false)
+                            }
+                            composable(
+                                "starred",
+                                enterTransition = {
+                                    slideIntoContainer(
+                                        AnimatedContentTransitionScope.SlideDirection.End,
+                                        tween(300)
+                                    )
+                                },
+                                exitTransition = {
+                                    slideOutOfContainer(
+                                        AnimatedContentTransitionScope.SlideDirection.Start,
+                                        tween(300)
+                                    )
+                                },
+                            ) {
+                                HomeScreen(vm, true)
+                            }
                             composable(
                                 "detail/{pokemonId}",
                                 arguments = listOf(navArgument("pokemonId") {
@@ -249,14 +270,12 @@ class MainActivity : ComponentActivity() {
                                 },
                             ) { DetailsPager(vm) }
                         }
-                        if (pokemonId > 0 && pokemonId != lastId) {
+                        if (navToDetails) {
                             if (navController.currentDestination?.hasRoute("detail/{pokemonId}", null) == true){
                                 navController.popBackStack("detail/{pokemonId}", true)
                             }
 
                             navController.navigate("detail/$pokemonId")
-
-                            vm.setLastPokemonId()
                         }
                     }
                 }

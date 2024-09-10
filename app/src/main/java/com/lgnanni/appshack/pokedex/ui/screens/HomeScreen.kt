@@ -21,7 +21,7 @@ import com.lgnanni.appshack.pokedex.viewmodel.PokemonListUiState
 import com.lgnanni.appshack.pokedex.viewmodel.PokemonListViewModel
 
 @Composable
-fun HomeScreen(mainVm: MainViewModel) {
+fun HomeScreen(mainVm: MainViewModel, starred: Boolean) {
     val vm: PokemonListViewModel = hiltViewModel()
 
     val uiState by vm.pokemonListUiState.collectAsStateWithLifecycle()
@@ -37,17 +37,20 @@ fun HomeScreen(mainVm: MainViewModel) {
         }
         is PokemonListUiState.ListPopulated -> {
             var text by remember { mutableStateOf("") }
-            vm.setFilteredList()
+            vm.setFilteredList(starred = starred)
 
             Column {
                 SearchField {
                     text = it
-                    vm.setFilteredList(it)
+                    vm.setFilteredList(it, starred)
                 }
                 LazyColumn {
                     items(filteredList.size) { pokemonIndex ->
-                        HomeItem(pokemonIndex + 1, filteredList[pokemonIndex].name) {
-                            mainVm.setPokemonId(pokemonIndex + 1)
+                        val totalList = (uiState as PokemonListUiState.ListPopulated).list
+                        val index = (totalList.indexOf(totalList.find { it.name == filteredList[pokemonIndex].name }) + 1)
+                        HomeItem(index, filteredList[pokemonIndex].name) {
+                            mainVm.setPokemonId(index)
+                            mainVm.setNavToDetails(true)
                         }
                     }
                 }

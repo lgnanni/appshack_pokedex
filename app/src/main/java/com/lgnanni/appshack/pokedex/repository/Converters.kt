@@ -62,8 +62,8 @@ class Converters {
 }
 
 // Extension functions to convert between User and UserEntity
-fun PokemonListEntity.toPokemonListItem() = PokemonListItem(name, url)
-fun PokemonListItem.toPokemonListEntity() = PokemonListEntity(name, url)
+fun PokemonListEntity.toPokemonListItem() = PokemonListItem(name, url, starred)
+fun PokemonListItem.toPokemonListEntity() = PokemonListEntity(name, url, starred)
 
-fun PokemonDetailsEntity.toPokemonDetails() = PokemonDetails(id, name, cries, officialSprite, speciesInfo, typeSprites)
-fun PokemonDetails.toPokemonDetailsEntity() = PokemonDetailsEntity(id, name, cries, officialSprite, speciesInfo, typeSprites)
+fun PokemonDetailsEntity.toPokemonDetails() = PokemonDetails(id, name, cries, officialSprite, speciesInfo, typeSprites, starred)
+fun PokemonDetails.toPokemonDetailsEntity() = PokemonDetailsEntity(id, name, cries, officialSprite, speciesInfo, typeSprites, starred)

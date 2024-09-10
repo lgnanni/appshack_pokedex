@@ -70,40 +70,54 @@ class PokedexRepoImpl @Inject constructor(
         var pokeName = ""
 
         runBlocking {
-            val cachedPokemonDetails = pokemonDetailsDao.getPokemonDetails(id)?.let {
+            pokemonDetailsDao.getPokemonDetails(id)?.let {
                 it.toPokemonDetails()
-            } ?: PokemonDetails()
-            pokeName = cachedPokemonDetails.name
+                pokeName = it.name
+            }
+
         }
 
         return if (pokeName.isNotEmpty()) {
+
             emitCachedPokemonDetails(id)
         } else
             // Fetch from remote
             getPokemonGeneralDetails(id).flatMapLatest { pokemon ->
                 getPokemonSpeciesDetails(pokemon.species.url).flatMapLatest { speciesInfo ->
                     getPokemonTypes(pokemon.types).flatMapLatest { typeSprites ->
-                        makePokemonDetails(pokemon, speciesInfo, typeSprites)
+                        val starred = getPokemonIsStarred(pokemon.name)
+                        makePokemonDetails(pokemon, speciesInfo, typeSprites, starred)
                     }
             }
         }
+    }
 
+    private suspend fun getPokemonIsStarred(name: String) : Boolean {
+        return pokemonListDao.getPokemon(name).starred
     }
 
     private fun emitCachedPokemonDetails(id: Int) : Flow<PokemonDetails> = flow{
         // Emit cached data first
         val cachedPokemonDetails = pokemonDetailsDao.getPokemonDetails(id).toPokemonDetails()
-        emit(cachedPokemonDetails)
+        val starred = getPokemonIsStarred(cachedPokemonDetails.name)
+
+        val starredDetails = PokemonDetails(cachedPokemonDetails, starred)
+        emit(starredDetails)
     }
 
-    private fun makePokemonDetails(pokemon: Pokemon, speciesInfo: SpeciesInfo, typeSprites: List<String>): Flow<PokemonDetails> = flow {
+    private fun makePokemonDetails(
+        pokemon: Pokemon,
+        speciesInfo: SpeciesInfo,
+        typeSprites: List<String>,
+        starred: Boolean): Flow<PokemonDetails> = flow {
         val pokemonDetails = PokemonDetails(
             pokemon.id,
             pokemon.name,
             pokemon.cries,
             pokemon.sprites.other.officialArtwork,
             speciesInfo,
-            typeSprites
+            typeSprites,
+            starred
         )
         // Cache the result locally
         pokemonDetailsDao.insertPokemonDetails(pokemonDetails.toPokemonDetailsEntity())
@@ -183,6 +197,13 @@ class PokedexRepoImpl @Inject constructor(
             // Handle exception
             e.printStackTrace()
         }
+    }
+
+    suspend fun updatePokemon(name: String, starred: Boolean) {
+        val pokeEntity = pokemonListDao.getPokemon(name)
+        pokeEntity.starred = starred
+
+        pokemonListDao.updatePokemonData(pokeEntity)
     }
 }
 

@@ -8,4 +8,4 @@ data class PokemonList(val count: Int, val next: String?, val previous: String?,
 
 
 @Parcelize
-data class PokemonListItem(val name: String, val url: String): Parcelable
+data class PokemonListItem(val name: String, val url: String, val starred: Boolean = false): Parcelable

@@ -53,8 +53,11 @@ class PokemonListViewModel @Inject constructor (repository: PokedexRepoImpl): Vi
         selectedId = flow
     }
 
-    fun setFilteredList(text: String  = "") {
-        filteredList.value = (pokemonListUiState.value as PokemonListUiState.ListPopulated).list.filter { it.name.contains(text) }
+    fun setFilteredList(text: String  = "", starred: Boolean) {
+        val initialList = if (starred) (pokemonListUiState.value as PokemonListUiState.ListPopulated).list.filter { it.starred }
+        else (pokemonListUiState.value as PokemonListUiState.ListPopulated).list
+
+        filteredList.value = initialList.filter{ it.name.contains(text) }
     }
 }
 

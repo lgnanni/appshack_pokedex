@@ -1,6 +1,7 @@
 package com.lgnanni.appshack.pokedex.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.lgnanni.appshack.pokedex.model.PokemonListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -9,32 +10,35 @@ import javax.inject.Inject
 class MainViewModel: ViewModel() {
 
     val error = MutableStateFlow("")
-    val darkTheme = MutableStateFlow(false)
     val connected = MutableStateFlow(false)
     val pokemonId = MutableStateFlow(0)
-    val lastPokemonId = MutableStateFlow(0)
-    val pokemonCount = MutableStateFlow(0)
+    val pokemons = MutableStateFlow(emptyList<PokemonListItem>())
 
-    fun setDarkTheme(dark: Boolean) { darkTheme.value = dark }
-
+    val navigateToDetails = MutableStateFlow(false)
     fun cleanError() { error.value = "" }
     fun setError(err: String) { error.value = err }
 
     fun setPokemonId(id: Int = 0) {
-        setLastPokemonId()
         pokemonId.value = id
     }
 
-    fun setLastPokemonId() { lastPokemonId.value = pokemonId.value }
 
-    fun setPokemonCount(count: Int) { pokemonCount.value = count }
+    fun setPokemons(pokemonsList: List<PokemonListItem>) { pokemons.value = pokemonsList }
 
     fun randomPokemon() {
-        val id = (1..pokemonCount.value).random()
-        setPokemonId(if (id == lastPokemonId.value) (1..lastPokemonId.value).random() else id)
+        val id = (1..pokemons.value.size).random()
+        setPokemonId(if (id == pokemonId.value)
+            (1..pokemonId.value).random()
+        else id)
+
+        setNavToDetails(true)
     }
 
-    fun firstLoad(): Boolean { return pokemonCount.value == 0 }
+    fun setNavToDetails(nav: Boolean) {
+        navigateToDetails.value = nav
+    }
+
+    fun firstLoad(): Boolean { return pokemons.value.isEmpty() }
 
     fun setIsConnected(conn: Boolean) {
         connected.value = conn

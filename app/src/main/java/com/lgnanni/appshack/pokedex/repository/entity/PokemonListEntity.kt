@@ -6,5 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "pokemonList")
 data class PokemonListEntity (
     @PrimaryKey val name: String,
-    val url: String
+    val url: String,
+    var starred: Boolean
     )

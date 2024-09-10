@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +26,8 @@ class PokemonDetailViewModel @Inject constructor (
     savedStateHandle: SavedStateHandle, ): ViewModel() {
 
 
+    private val repo = repository
+
     private val _pokemonId = MutableStateFlow(savedStateHandle["pokemonId"] ?: 0) // Default value if not provided
     val pokemonId: StateFlow<Int> = _pokemonId.asStateFlow()
 
@@ -32,7 +35,7 @@ class PokemonDetailViewModel @Inject constructor (
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState = _pokemonId.flatMapLatest {
-        repository.getPokemonDetails(_pokemonId.value)
+        repo.getPokemonDetails(_pokemonId.value)
             .asUiState()
             .stateIn(
                 viewModelScope,
@@ -47,6 +50,12 @@ class PokemonDetailViewModel @Inject constructor (
 
     fun setFirstLoad(value: Boolean) {
         firstLoad.value = value
+    }
+
+    fun updatePokemon(name: String, starred: Boolean) {
+        viewModelScope.launch {
+            repo.updatePokemon(name, starred)
+        }
     }
 
 }
@@ -66,22 +75,3 @@ fun <T> Flow<T>.asUiState(
     }.catch {
         emit(UiState.Error(errorMessage ?: it.message))
     }
-
-
-fun <T, R> UiState<T>.mapSuccess(transform: (T) -> R): UiState<R> {
-    return when (this) {
-        is UiState.Loading -> UiState.Loading
-        is UiState.Success -> UiState.Success(transform(data))
-        is UiState.Error -> UiState.Error(message)
-        is UiState.Empty -> UiState.Empty(message)
-    }
-}
-
-
-        /*
-sealed interface PokemonDetailsUiState {
-    data object Loading : PokemonDetailsUiState
-    data object Error : PokemonDetailsUiState
-    data class DetailsLoaded(val details: PokemonDetails) : PokemonDetailsUiState
-}
-*/

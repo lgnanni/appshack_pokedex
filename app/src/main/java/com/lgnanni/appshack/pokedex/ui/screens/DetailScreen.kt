@@ -17,9 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
@@ -38,9 +42,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.lgnanni.appshack.pokedex.R
 import com.lgnanni.appshack.pokedex.model.PokemonDetails
+import com.lgnanni.appshack.pokedex.viewmodel.MainViewModel
 import com.lgnanni.appshack.pokedex.viewmodel.PokemonDetailViewModel
 import com.lgnanni.appshack.pokedex.viewmodel.UiState
+import kotlinx.coroutines.coroutineScope
 import okio.IOException
 
 @Composable
@@ -66,7 +73,7 @@ fun DetailScreen(pokeId: Int) {
                 vm.setFirstLoad(false)
             }
 
-            PokemonDetailsView(details = details)
+            PokemonDetailsView(vm, details)
         }
         is UiState.Loading -> { LoadingScreen() }
 
@@ -84,7 +91,7 @@ fun LoadingScreen () {
 }
 
 @Composable
-fun PokemonDetailsView(details: PokemonDetails) {
+fun PokemonDetailsView(vm: PokemonDetailViewModel, details: PokemonDetails) {
     var shiny by remember { mutableStateOf(false) }
 
     val imageLoaderDefault = ImageRequest.Builder(LocalContext.current)
@@ -110,7 +117,7 @@ fun PokemonDetailsView(details: PokemonDetails) {
 
     Column(modifier = Modifier.padding(8.dp)) {
 
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             this@Column.AnimatedVisibility(
                 visible = !shiny,
                 enter = fadeIn(),
@@ -127,7 +134,7 @@ fun PokemonDetailsView(details: PokemonDetails) {
                     {
                         Box(
                             modifier = Modifier
-                                .height(180.dp)
+                                .height(300.dp)
                                 .fillMaxWidth()
                                 .padding(20.dp),
                             contentAlignment = Alignment.Center
@@ -154,7 +161,7 @@ fun PokemonDetailsView(details: PokemonDetails) {
                     {
                         Box(
                             modifier = Modifier
-                                .height(180.dp)
+                                .height(300.dp)
                                 .fillMaxWidth()
                                 .padding(20.dp),
                             contentAlignment = Alignment.Center
@@ -163,6 +170,17 @@ fun PokemonDetailsView(details: PokemonDetails) {
                         }
                     }
                 )
+            }
+            val starIconBoolean = remember { mutableStateOf(details.starred) }
+
+            IconToggleButton(
+                checked = starIconBoolean.value, onCheckedChange = {
+                    vm.updatePokemon(details.name, it)
+                    starIconBoolean.value = it
+                }, modifier = Modifier.align(Alignment.TopEnd)) {
+
+                val starIcon = if(starIconBoolean.value) Icons.Filled.Star else Icons.Filled.StarBorder
+                Icon(imageVector = starIcon, contentDescription = stringResource(id = R.string.starred))
             }
 
         }
