@@ -14,16 +14,6 @@ data class PokemonDetails(
     val starred: Boolean
     ) : Parcelable {
 
-        constructor() : this (
-            -1,
-            "",
-            Cries("", ""),
-            OfficialSprites("", ""),
-            SpeciesData(EvolutionDetails(), EvolutionTrigger(emptyList()), "", emptyList()),
-            emptyList(),
-    false
-        )
-
     constructor(details: PokemonDetails, starred: Boolean) : this (
         details.id,
         details.name,

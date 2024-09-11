@@ -1,7 +1,6 @@
 package com.lgnanni.appshack.pokedex.network
 
 import com.lgnanni.appshack.pokedex.model.Chain
-import com.lgnanni.appshack.pokedex.model.EvoChain
 import com.lgnanni.appshack.pokedex.model.EvolutionTrigger
 import com.lgnanni.appshack.pokedex.model.Pokemon
 import com.lgnanni.appshack.pokedex.model.PokemonList

@@ -1,11 +1,6 @@
 package com.lgnanni.appshack.pokedex.repository
 
-import android.content.Context
-import androidx.datastore.dataStore
 import com.lgnanni.appshack.pokedex.model.Chain
-import com.lgnanni.appshack.pokedex.model.EvoChain
-import com.lgnanni.appshack.pokedex.model.EvoTriggerLanguage
-import com.lgnanni.appshack.pokedex.model.EvolutionChain
 import com.lgnanni.appshack.pokedex.model.EvolutionDetails
 import com.lgnanni.appshack.pokedex.model.EvolutionTrigger
 import com.lgnanni.appshack.pokedex.model.Pokemon
@@ -19,17 +14,11 @@ import com.lgnanni.appshack.pokedex.network.ApiService
 import com.lgnanni.appshack.pokedex.network.RetrofitModule
 import com.lgnanni.appshack.pokedex.repository.dao.PokemonDetailsDao
 import com.lgnanni.appshack.pokedex.repository.dao.PokemonListDao
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.yield
-
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,7 +30,6 @@ interface PokedexRepo {
 
 @Singleton
 class PokedexRepoImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val pokemonApi: ApiService,
     private val pokemonListDao : PokemonListDao,
     private val pokemonDetailsDao: PokemonDetailsDao) : PokedexRepo {
@@ -49,7 +37,6 @@ class PokedexRepoImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getPokemonList(): Flow<List<PokemonListItem>> {
-
         var cachedCount = 0
         runBlocking {
             // Emit cached data first
@@ -123,36 +110,31 @@ class PokedexRepoImpl @Inject constructor(
      * with nested arrays of the same type until there's an empty array object
      */
     private fun getPokemonEvolutionToDetails(pokemon: String, evoChain: Chain) : EvolutionDetails {
-        if (pokemon == evoChain.chain.species.name) {
+        if (pokemon.contains(evoChain.chain.species.name)) {
             val details = if(evoChain.chain.evolvesTo.isEmpty())
                 EvolutionDetails()
             else evoChain.chain.evolvesTo.first().evoDetails.first()
             return details
         }
 
-        val firstChild = evoChain.chain.evolvesTo.first()
-        if (pokemon == firstChild.species.name) {
+        val firstPath = evoChain.chain.evolvesTo
+        val firstChild = firstPath.find { pokemon.contains(it.species.name)}
+
+        if (firstChild != null) {
             val details = if(firstChild.evolvesTo.isEmpty())
                 EvolutionDetails()
             else firstChild.evolvesTo.first().evoDetails.first()
             return details
         }
        else {
-            val secondChild = firstChild.evolvesTo.first()
-            if (pokemon == secondChild.species.name) {
-                val details = if (secondChild.evolvesTo.isEmpty())
+            val secondPath = firstPath.first().evolvesTo
+        val secondChild = secondPath.find { pokemon.contains(it.species.name) }
+
+            if (secondChild != null) {
+                val details = if(secondChild.evolvesTo.isEmpty())
                     EvolutionDetails()
                 else secondChild.evolvesTo.first().evoDetails.first()
                 return details
-            }
-            else {
-                val thirdChild = secondChild.evolvesTo.first()
-                if (pokemon == thirdChild.species.name) {
-                    val details = if(thirdChild.evolvesTo.first().evoDetails.isEmpty())
-                        EvolutionDetails()
-                    else thirdChild.evolvesTo.first().evoDetails.first()
-                    return details
-                }
             }
         }
 
@@ -165,13 +147,13 @@ class PokedexRepoImpl @Inject constructor(
      * with nested arrays of the same type until there's an empty array object
      */
     private fun getPokemonEvolutionTo(pokemon: String, evoChain: Chain) : String {
-        if (pokemon == evoChain.chain.species.name)
+        if (pokemon.contains(evoChain.chain.species.name))
             return if (evoChain.chain.evolvesTo.isEmpty()) "" else evoChain.chain.evolvesTo.first().species.name
 
 
         val firstChild = evoChain.chain.evolvesTo.first()
 
-        if (pokemon == firstChild.species.name) {
+        if (pokemon.contains(firstChild.species.name)) {
             val evolveTo = if(firstChild.evolvesTo.isEmpty()) ""
                     else firstChild.evolvesTo.first().species.name
 
@@ -179,20 +161,11 @@ class PokedexRepoImpl @Inject constructor(
         }
         else {
             val secondChild = firstChild.evolvesTo.first()
-            if (pokemon == secondChild.species.name) {
+            if (pokemon.contains(secondChild.species.name)) {
                 val evolveTo = if (secondChild.evolvesTo.isEmpty()) ""
                 else secondChild.evolvesTo.first().species.name
 
                 return evolveTo
-            }
-            else {
-                val thirdChild = secondChild.evolvesTo.first()
-                if (pokemon == thirdChild.species.name) {
-                    val evolveTo = if(thirdChild.evolvesTo.isEmpty()) ""
-                    else thirdChild.evolvesTo.first().species.name
-
-                    return evolveTo
-                }
             }
         }
 

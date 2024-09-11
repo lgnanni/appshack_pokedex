@@ -5,15 +5,11 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.lgnanni.appshack.pokedex.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

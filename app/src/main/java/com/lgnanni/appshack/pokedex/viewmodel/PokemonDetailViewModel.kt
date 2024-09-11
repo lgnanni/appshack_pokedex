@@ -3,8 +3,6 @@ package com.lgnanni.appshack.pokedex.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lgnanni.appshack.pokedex.model.PokemonDetails
-import com.lgnanni.appshack.pokedex.model.PokemonListItem
 import com.lgnanni.appshack.pokedex.repository.PokedexRepoImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

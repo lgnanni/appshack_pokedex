@@ -8,8 +8,6 @@ import com.lgnanni.appshack.pokedex.model.OfficialSprites
 import com.lgnanni.appshack.pokedex.model.PokemonDetails
 import com.lgnanni.appshack.pokedex.model.PokemonListItem
 import com.lgnanni.appshack.pokedex.model.SpeciesData
-import com.lgnanni.appshack.pokedex.model.SpeciesInfo
-import com.lgnanni.appshack.pokedex.model.TypeSprite
 import com.lgnanni.appshack.pokedex.repository.entity.PokemonDetailsEntity
 import com.lgnanni.appshack.pokedex.repository.entity.PokemonListEntity
 

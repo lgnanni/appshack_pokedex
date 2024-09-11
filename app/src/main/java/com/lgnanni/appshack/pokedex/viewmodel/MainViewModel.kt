@@ -2,9 +2,7 @@ package com.lgnanni.appshack.pokedex.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.lgnanni.appshack.pokedex.model.PokemonListItem
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import javax.inject.Inject
 
 
 class MainViewModel: ViewModel() {

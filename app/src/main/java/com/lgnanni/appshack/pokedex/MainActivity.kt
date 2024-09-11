@@ -11,7 +11,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -34,7 +33,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +51,6 @@ import androidx.navigation.navArgument
 import com.lgnanni.appshack.pokedex.network.ConnectionState
 import com.lgnanni.appshack.pokedex.network.connectivityState
 import com.lgnanni.appshack.pokedex.ui.screens.BottomNavigationBar
-import com.lgnanni.appshack.pokedex.ui.screens.DetailScreen
 import com.lgnanni.appshack.pokedex.ui.screens.DetailsPager
 import com.lgnanni.appshack.pokedex.ui.screens.HomeScreen
 import com.lgnanni.appshack.pokedex.ui.theme.AppshackPokedexTheme

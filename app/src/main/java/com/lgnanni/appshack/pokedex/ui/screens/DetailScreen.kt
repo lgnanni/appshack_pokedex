@@ -49,10 +49,8 @@ import coil.request.ImageRequest
 import com.lgnanni.appshack.pokedex.R
 import com.lgnanni.appshack.pokedex.model.PokemonDetails
 import com.lgnanni.appshack.pokedex.model.SpeciesData
-import com.lgnanni.appshack.pokedex.viewmodel.MainViewModel
 import com.lgnanni.appshack.pokedex.viewmodel.PokemonDetailViewModel
 import com.lgnanni.appshack.pokedex.viewmodel.UiState
-import kotlinx.coroutines.coroutineScope
 import okio.IOException
 
 @Composable
