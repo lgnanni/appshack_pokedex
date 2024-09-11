@@ -5,4 +5,7 @@
     <string name="search">Search</string>
     <string name="home">Pokedex</string>
     <string name="starred">Starred</string>
+    <string name="evolvesTo">Evolves to: %s</string>
+    <string name="method">Method: %s</string>
+    <string name="finalForm">Final form</string>
 </resources>

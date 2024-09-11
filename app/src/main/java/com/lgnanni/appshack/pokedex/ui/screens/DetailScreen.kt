@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Star
@@ -36,7 +38,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +48,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.lgnanni.appshack.pokedex.R
 import com.lgnanni.appshack.pokedex.model.PokemonDetails
+import com.lgnanni.appshack.pokedex.model.SpeciesData
 import com.lgnanni.appshack.pokedex.viewmodel.MainViewModel
 import com.lgnanni.appshack.pokedex.viewmodel.PokemonDetailViewModel
 import com.lgnanni.appshack.pokedex.viewmodel.UiState
@@ -115,8 +120,7 @@ fun PokemonDetailsView(vm: PokemonDetailViewModel, details: PokemonDetails) {
         typeSpritesBuilders.add(imageType)
     }
 
-    Column(modifier = Modifier.padding(8.dp)) {
-
+    Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp)) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             this@Column.AnimatedVisibility(
                 visible = !shiny,
@@ -126,7 +130,8 @@ fun PokemonDetailsView(vm: PokemonDetailViewModel, details: PokemonDetails) {
                 SubcomposeAsyncImage(
                     modifier = Modifier
                         .clickable { shiny = true }
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .align(Alignment.TopStart),
                     model = imageLoaderDefault,
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
@@ -153,7 +158,8 @@ fun PokemonDetailsView(vm: PokemonDetailViewModel, details: PokemonDetails) {
                 SubcomposeAsyncImage(
                     modifier = Modifier
                         .clickable { shiny = false }
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .align(Alignment.TopStart),
                     model = imageLoaderShiny,
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
@@ -200,23 +206,59 @@ fun PokemonDetailsView(vm: PokemonDetailViewModel, details: PokemonDetails) {
                         contentDescription = null
                     )
                 }
+        }
 
-                Spacer(Modifier.weight(1f))
-
-                typeSpritesBuilders.forEach {
-                    SubcomposeAsyncImage(
-                        model = it,
-                        contentDescription = null,
-                        contentScale = ContentScale.FillHeight)
-                }
+        Row (modifier = Modifier
+            .fillMaxWidth()
+            .height(30.dp)){
+            typeSpritesBuilders.forEach {
+                SubcomposeAsyncImage(
+                    model = it,
+                    contentDescription = null)
             }
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
 
         val text =
-            details.speciesInfo.flavorTextEntries.first { it.language.name.contentEquals("en") }
+            details.speciesData.flavorTexts.first { it.language.name.contentEquals("en") }
 
         Text(
             text = text.flavorText,
-            style = MaterialTheme.typography.bodyLarge)
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Start)
+
+        if (details.speciesData.evolvesTo.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            EvolveData(speciesData = details.speciesData)
+        } else {
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(text = stringResource(id = R.string.finalForm),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Start)
+        }
+    }
+
+}
+
+@Composable
+private fun EvolveData(speciesData: SpeciesData) {
+    //As the information to get evolution methods is quite convoluted to access
+    //will show minimal info, on a future iteration could improve and make it nicer
+
+    Column {
+        Text(text = String.format(stringResource(id = R.string.evolvesTo),
+            speciesData.evolvesTo.capitalize(Locale.current)),
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Start)
+
+        Text(text = String.format(stringResource(id = R.string.method),
+            speciesData.evolutionTrigger.names.find { it.language.name == "en" }!!.name),
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Start)
     }
 
 }

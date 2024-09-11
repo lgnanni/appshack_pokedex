@@ -7,7 +7,4 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class FlavorText(
     @SerializedName("flavor_text") val flavorText: String,
-    val language: Language): Parcelable
-
-@Parcelize
-data class Language(val name: String) : Parcelable
+    val language: PokemonUrl): Parcelable

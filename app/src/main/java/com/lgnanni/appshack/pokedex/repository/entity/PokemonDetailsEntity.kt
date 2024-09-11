@@ -4,8 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.lgnanni.appshack.pokedex.model.Cries
 import com.lgnanni.appshack.pokedex.model.OfficialSprites
-import com.lgnanni.appshack.pokedex.model.SpeciesInfo
-import com.lgnanni.appshack.pokedex.model.TypeSprite
+import com.lgnanni.appshack.pokedex.model.SpeciesData
 
 @Entity(tableName = "pokemonDetails")
 data class PokemonDetailsEntity (
@@ -13,7 +12,7 @@ data class PokemonDetailsEntity (
     val name: String,
     val cries: Cries,
     val officialSprite: OfficialSprites,
-    val speciesInfo: SpeciesInfo,
+    val speciesData: SpeciesData,
     val typeSprites: List<String>,
     val starred: Boolean
 )

@@ -9,7 +9,7 @@ data class PokemonDetails(
     val name: String,
     val cries: Cries,
     val officialSprite: OfficialSprites,
-    val speciesInfo: SpeciesInfo,
+    val speciesData: SpeciesData,
     val typeSprites: List<String>,
     val starred: Boolean
     ) : Parcelable {
@@ -19,7 +19,7 @@ data class PokemonDetails(
             "",
             Cries("", ""),
             OfficialSprites("", ""),
-            SpeciesInfo(EvoChain( ""), emptyList()),
+            SpeciesData(EvolutionDetails(), EvolutionTrigger(emptyList()), "", emptyList()),
             emptyList(),
     false
         )
@@ -29,10 +29,13 @@ data class PokemonDetails(
         details.name,
         details.cries,
         details.officialSprite,
-        details.speciesInfo,
+        details.speciesData,
         details.typeSprites,
         starred
     )
 
 }
+
+@Parcelize
+data class SpeciesData(val evolutionDetails: EvolutionDetails, val evolutionTrigger: EvolutionTrigger, val evolvesTo: String, val flavorTexts: List<FlavorText>) : Parcelable
 

@@ -7,6 +7,7 @@ import com.lgnanni.appshack.pokedex.model.Cries
 import com.lgnanni.appshack.pokedex.model.OfficialSprites
 import com.lgnanni.appshack.pokedex.model.PokemonDetails
 import com.lgnanni.appshack.pokedex.model.PokemonListItem
+import com.lgnanni.appshack.pokedex.model.SpeciesData
 import com.lgnanni.appshack.pokedex.model.SpeciesInfo
 import com.lgnanni.appshack.pokedex.model.TypeSprite
 import com.lgnanni.appshack.pokedex.repository.entity.PokemonDetailsEntity
@@ -39,14 +40,14 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromSpeciesInfo(speciesInfo: SpeciesInfo): String {
-        return gson.toJson(speciesInfo)
+    fun fromSpeciesData(speciesData: SpeciesData): String {
+        return gson.toJson(speciesData)
     }
 
     @TypeConverter
-    fun toSpeciesInfo(speciesInfoString: String): SpeciesInfo {
-        val type = object : TypeToken<SpeciesInfo>() {}.type
-        return gson.fromJson(speciesInfoString, type)
+    fun toSpeciesData(speciesDataString: String): SpeciesData {
+        val type = object : TypeToken<SpeciesData>() {}.type
+        return gson.fromJson(speciesDataString, type)
     }
 
     @TypeConverter
@@ -65,5 +66,5 @@ class Converters {
 fun PokemonListEntity.toPokemonListItem() = PokemonListItem(name, url, starred)
 fun PokemonListItem.toPokemonListEntity() = PokemonListEntity(name, url, starred)
 
-fun PokemonDetailsEntity.toPokemonDetails() = PokemonDetails(id, name, cries, officialSprite, speciesInfo, typeSprites, starred)
-fun PokemonDetails.toPokemonDetailsEntity() = PokemonDetailsEntity(id, name, cries, officialSprite, speciesInfo, typeSprites, starred)
+fun PokemonDetailsEntity.toPokemonDetails() = PokemonDetails(id, name, cries, officialSprite, speciesData, typeSprites, starred)
+fun PokemonDetails.toPokemonDetailsEntity() = PokemonDetailsEntity(id, name, cries, officialSprite, speciesData, typeSprites, starred)

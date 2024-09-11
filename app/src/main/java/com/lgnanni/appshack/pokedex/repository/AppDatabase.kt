@@ -16,7 +16,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Database(entities = [PokemonListEntity::class, PokemonDetailsEntity::class], version = 3)
+@Database(entities = [PokemonListEntity::class, PokemonDetailsEntity::class], version = 4)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun pokemonListDao(): PokemonListDao

@@ -2,10 +2,17 @@ package com.lgnanni.appshack.pokedex.repository
 
 import android.content.Context
 import androidx.datastore.dataStore
+import com.lgnanni.appshack.pokedex.model.Chain
+import com.lgnanni.appshack.pokedex.model.EvoChain
+import com.lgnanni.appshack.pokedex.model.EvoTriggerLanguage
+import com.lgnanni.appshack.pokedex.model.EvolutionChain
+import com.lgnanni.appshack.pokedex.model.EvolutionDetails
+import com.lgnanni.appshack.pokedex.model.EvolutionTrigger
 import com.lgnanni.appshack.pokedex.model.Pokemon
 import com.lgnanni.appshack.pokedex.model.PokemonDetails
 import com.lgnanni.appshack.pokedex.model.PokemonList
 import com.lgnanni.appshack.pokedex.model.PokemonListItem
+import com.lgnanni.appshack.pokedex.model.SpeciesData
 import com.lgnanni.appshack.pokedex.model.SpeciesInfo
 import com.lgnanni.appshack.pokedex.model.Types
 import com.lgnanni.appshack.pokedex.network.ApiService
@@ -78,19 +85,120 @@ class PokedexRepoImpl @Inject constructor(
         }
 
         return if (pokeName.isNotEmpty()) {
-
             emitCachedPokemonDetails(id)
         } else
             // Fetch from remote
             getPokemonGeneralDetails(id).flatMapLatest { pokemon ->
                 getPokemonSpeciesDetails(pokemon.species.url).flatMapLatest { speciesInfo ->
-                    getPokemonTypes(pokemon.types).flatMapLatest { typeSprites ->
-                        val starred = getPokemonIsStarred(pokemon.name)
-                        makePokemonDetails(pokemon, speciesInfo, typeSprites, starred)
+                    getPokemonEvoDetails(speciesInfo.evoChain.url).flatMapLatest { evoChain ->
+                        val evoDetails = getPokemonEvolutionToDetails(pokemon.name, evoChain)
+
+                        if (evoDetails.trigger.url.isEmpty()) {
+                            getPokemonTypes(pokemon.types).flatMapLatest { typeSprites ->
+                                val starred = getPokemonIsStarred(pokemon.name)
+                                val speciesData = SpeciesData(evoDetails, EvolutionTrigger(), getPokemonEvolutionTo(pokemon.name, evoChain), speciesInfo.flavorTextEntries)
+                                makePokemonDetails(pokemon, speciesData, typeSprites, starred)
+                            }
+                        } else {
+                            getPokemonEvoTrigger(evoDetails.trigger.url).flatMapLatest { evoTrigger ->
+                                getPokemonTypes(pokemon.types).flatMapLatest { typeSprites ->
+                                    val starred = getPokemonIsStarred(pokemon.name)
+                                    val speciesData = SpeciesData(
+                                        evoDetails,
+                                        evoTrigger,
+                                        getPokemonEvolutionTo(pokemon.name, evoChain),
+                                        speciesInfo.flavorTextEntries
+                                    )
+                                    makePokemonDetails(pokemon, speciesData, typeSprites, starred)
+                                }
+                            }
+                        }
                     }
             }
         }
     }
+
+    /**
+     * The information about evolutions is quite convoluted and forces this manual approach
+     * with nested arrays of the same type until there's an empty array object
+     */
+    private fun getPokemonEvolutionToDetails(pokemon: String, evoChain: Chain) : EvolutionDetails {
+        if (pokemon == evoChain.chain.species.name) {
+            val details = if(evoChain.chain.evolvesTo.isEmpty())
+                EvolutionDetails()
+            else evoChain.chain.evolvesTo.first().evoDetails.first()
+            return details
+        }
+
+        val firstChild = evoChain.chain.evolvesTo.first()
+        if (pokemon == firstChild.species.name) {
+            val details = if(firstChild.evolvesTo.isEmpty())
+                EvolutionDetails()
+            else firstChild.evolvesTo.first().evoDetails.first()
+            return details
+        }
+       else {
+            val secondChild = firstChild.evolvesTo.first()
+            if (pokemon == secondChild.species.name) {
+                val details = if (secondChild.evolvesTo.isEmpty())
+                    EvolutionDetails()
+                else secondChild.evolvesTo.first().evoDetails.first()
+                return details
+            }
+            else {
+                val thirdChild = secondChild.evolvesTo.first()
+                if (pokemon == thirdChild.species.name) {
+                    val details = if(thirdChild.evolvesTo.first().evoDetails.isEmpty())
+                        EvolutionDetails()
+                    else thirdChild.evolvesTo.first().evoDetails.first()
+                    return details
+                }
+            }
+        }
+
+        return EvolutionDetails()
+    }
+
+
+    /**
+     * The information about evolutions is quite convoluted and forces this manual approach
+     * with nested arrays of the same type until there's an empty array object
+     */
+    private fun getPokemonEvolutionTo(pokemon: String, evoChain: Chain) : String {
+        if (pokemon == evoChain.chain.species.name)
+            return if (evoChain.chain.evolvesTo.isEmpty()) "" else evoChain.chain.evolvesTo.first().species.name
+
+
+        val firstChild = evoChain.chain.evolvesTo.first()
+
+        if (pokemon == firstChild.species.name) {
+            val evolveTo = if(firstChild.evolvesTo.isEmpty()) ""
+                    else firstChild.evolvesTo.first().species.name
+
+            return evolveTo
+        }
+        else {
+            val secondChild = firstChild.evolvesTo.first()
+            if (pokemon == secondChild.species.name) {
+                val evolveTo = if (secondChild.evolvesTo.isEmpty()) ""
+                else secondChild.evolvesTo.first().species.name
+
+                return evolveTo
+            }
+            else {
+                val thirdChild = secondChild.evolvesTo.first()
+                if (pokemon == thirdChild.species.name) {
+                    val evolveTo = if(thirdChild.evolvesTo.isEmpty()) ""
+                    else thirdChild.evolvesTo.first().species.name
+
+                    return evolveTo
+                }
+            }
+        }
+
+        return ""
+    }
+
 
     private suspend fun getPokemonIsStarred(name: String) : Boolean {
         return pokemonListDao.getPokemon(name).starred
@@ -107,7 +215,7 @@ class PokedexRepoImpl @Inject constructor(
 
     private fun makePokemonDetails(
         pokemon: Pokemon,
-        speciesInfo: SpeciesInfo,
+        speciesData: SpeciesData,
         typeSprites: List<String>,
         starred: Boolean): Flow<PokemonDetails> = flow {
         val pokemonDetails = PokemonDetails(
@@ -115,7 +223,7 @@ class PokedexRepoImpl @Inject constructor(
             pokemon.name,
             pokemon.cries,
             pokemon.sprites.other.officialArtwork,
-            speciesInfo,
+            speciesData,
             typeSprites,
             starred
         )
@@ -146,6 +254,26 @@ class PokedexRepoImpl @Inject constructor(
         try {
             val remotePokemonSpecies = pokemonApi.getSpeciesDetails(RetrofitModule.removeBaseUrl(url))
             emit(remotePokemonSpecies.body()!!)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun getPokemonEvoDetails(url: String): Flow<Chain> = flow {
+        try {
+            val remoteEvoChain = pokemonApi.getEvolutionDetails(RetrofitModule.removeBaseUrl(url))
+            emit(remoteEvoChain.body()!!)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun getPokemonEvoTrigger(url: String): Flow<EvolutionTrigger> = flow {
+        try {
+            val remoteEvoTrigger = pokemonApi.getEvolutionTrigger(RetrofitModule.removeBaseUrl(url))
+            emit(remoteEvoTrigger.body()!!)
         }
         catch (e: Exception) {
             e.printStackTrace()
